@@ -1,0 +1,2 @@
+export const MAX_KEYWORDS_NUM = 50;
+export const KEYWORDS_PROCESS_INTERVAL = 300;
