@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Puppeteer Tracing Results
+src/puppeteer/result/*
