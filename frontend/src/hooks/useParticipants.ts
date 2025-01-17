@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useSocketStore, useParticipantsStore } from '@/stores';
 import { ParticipantItem } from '@/types';
@@ -79,7 +80,7 @@ const useParticipants = (roomId: string | null, finishInitialLoading: () => void
         disconnect();
       };
     }
-  }, [socket, roomId, setParticipants]);
+  }, [socket, roomId, connect, disconnect]);
 
   return { participants, hostId, currentUserId, roomExists };
 };
