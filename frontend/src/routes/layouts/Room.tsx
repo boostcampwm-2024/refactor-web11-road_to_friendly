@@ -37,8 +37,9 @@ const RoomLayout = () => {
 
   const participantElements = useMemo(
     () =>
-      Object.keys(participants).map((participantId, idx) => {
-        const position = positions[idx];
+      Object.keys(participants).map((participantId) => {
+        const index = participants[participantId]?.index || 0;
+        const position = positions[index];
 
         return position ? (
           <UserProfile
