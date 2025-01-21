@@ -27,11 +27,9 @@ const RoomCreateButton = () => {
         const roomUrl = new URL(response.url);
         if (roomUrl) navigate(roomUrl.pathname);
       } else {
-        console.error('Failed to create room');
         openToast({ text: '서버와 통신 중 에러가 발생했습니다!', type: 'error' });
       }
-    } catch (error) {
-      console.error('Error creating room:', error);
+    } catch {
       openToast({ text: '서버와 통신 중 에러가 발생했습니다!', type: 'error' });
     } finally {
       setLoading(false);

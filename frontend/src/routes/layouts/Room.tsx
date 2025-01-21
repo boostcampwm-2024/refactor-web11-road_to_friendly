@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { useEffect, useMemo } from 'react';
 import { useErrorBoundary } from 'react-error-boundary';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import useParticipants from '@/hooks/useParticipants';
 
@@ -24,6 +24,7 @@ const RoomLayout = () => {
   const { initialLoading, finishInitialLoading } = useLoadingState();
   const navigate = useNavigate();
   const params = useParams();
+  const locaton = useLocation();
 
   const { participants, hostId, currentUserId, roomExists } = useParticipants(roomId, finishInitialLoading);
   const { radius, setRadius, increaseRadius } = useRadiusStore();
@@ -78,11 +79,14 @@ const RoomLayout = () => {
 
   if (!roomExists) showBoundary(new Error(roomError.RoomNotFound));
 
+  // URL이 정확히 /rooms/:roomId 인 경우 join 페이지로 이동
   useEffect(() => {
     if (!initialLoading) {
-      navigate(`/rooms/${params.roomId}/join`);
+      if (location.pathname.endsWith(params.roomId)) {
+        navigate('join', { replace: true });
+      }
     }
-  }, [initialLoading, params.roomId]);
+  }, [initialLoading, params.roomId, locaton.pathname, navigate]);
 
   return (
     <>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 
 import { useSocketStore, useParticipantsStore } from '@/stores';
 import { ParticipantItem } from '@/types';
