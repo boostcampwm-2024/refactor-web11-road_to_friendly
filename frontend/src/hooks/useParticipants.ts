@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 
 import { useSocketStore, useParticipantsStore } from '@/stores';
 import { ParticipantItem } from '@/types';
@@ -48,7 +47,15 @@ const useParticipants = (roomId: string | null, finishInitialLoading: () => void
   const handleParticipantExit = (Participant: { participantId: string; nickname: string }) => {
     setParticipants((prev) => {
       const newParticipants = { ...prev };
+      const deletedIndex = newParticipants[Participant.participantId].index;
       delete newParticipants[Participant.participantId];
+      // 퇴장한 참여자 index보다 뒤의 참여자들 index 재조정
+      Object.keys(newParticipants).forEach((key) => {
+        if (newParticipants[key].index > deletedIndex) {
+          newParticipants[key].index -= 1;
+        }
+      });
+
       return newParticipants;
     });
   };

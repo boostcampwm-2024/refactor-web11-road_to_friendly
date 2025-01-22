@@ -19,33 +19,6 @@ const router = createBrowserRouter([
   {
     path: '/rooms/:roomId',
     element: <RoomLayout />,
-    // loader: async ({ params }) => {
-    //   const { roomId } = params;
-    //   const socket = io(config.SOCKET_SERVER_URL);
-    //   socket.emit(
-    //     'join',
-    //     { roomId },
-    //     (response: { status: string; body: { participants: ParticipantItem[]; hostId: string } }) => {
-    //       const roomExists = response.status === 'ok';
-    //       if (roomExists) {
-    //         // 참가자 목록에 index 추가
-    //         const participantsWithIndex = response.body.participants.map((participant, index) => ({
-    //           ...participant,
-    //           index
-    //         }));
-
-    //         setParticipants(convertArrayToObject(participantsWithIndex));
-    //         setHostId(response.body.hostId);
-    //         finishInitialLoading();
-    //         // navigate(`/rooms/${params.roomId}/join`);
-    //       } else {
-    //         // TODO: ErrorElement 표시
-    //       }
-    //       setCurrentUserId(socket?.id || null);
-    //     }
-    //   );
-    //   return {};
-    // },
     children: [
       {
         path: 'join',

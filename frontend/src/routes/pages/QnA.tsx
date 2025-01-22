@@ -12,6 +12,8 @@ import { Question } from '@/types';
 import { getRemainingSeconds } from '@/utils';
 import TimerWorker from '@/workers/timerWorker.js?worker';
 
+import LoadingPage from './LoadingPage';
+
 const QnAPhaseView = () => {
   const { socket, connect } = useSocketStore();
   const { questions, setQuestions } = useQuestionsStore();
@@ -172,7 +174,9 @@ const QnAPhaseView = () => {
         />
       </div>
     </div>
-  ) : null;
+  ) : (
+    <LoadingPage loadingMessage="질문 리스트를 불러오고 있어요..." />
+  );
 };
 
 export default QnAPhaseView;
