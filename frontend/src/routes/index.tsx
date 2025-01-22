@@ -1,15 +1,14 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Socket, io } from 'socket.io-client';
 
-import { config } from '@/config';
-import LandingPage from '@/routes/pages/LandingPage';
-import { ParticipantItem } from '@/types';
+import LoadingPage from './pages/LoadingPage';
 
-import RoomLayout from './layouts/Room';
-import ContentSharePhaseView from './pages/ContentShare';
-import JoinPhaseView from './pages/Join';
-import QnAPhaseView from './pages/QnA';
-import StatisticsPhaseView from './pages/Statistics';
+const LandingPage = lazy(() => import('@/routes/pages/LandingPage'));
+const RoomLayout = lazy(() => import('@/routes/layouts/Room'));
+const JoinPhaseView = lazy(() => import('@/routes/pages/Join'));
+const QnAPhaseView = lazy(() => import('@/routes/pages/QnA'));
+const StatisticsPhaseView = lazy(() => import('@/routes/pages/Statistics'));
+const ContentSharePhaseView = lazy(() => import('@/routes/pages/ContentShare'));
 
 const router = createBrowserRouter([
   {
@@ -41,5 +40,9 @@ const router = createBrowserRouter([
 ]);
 
 export default function Router() {
-  return <RouterProvider router={router} />;
+  return (
+    <Suspense fallback={<LoadingPage />}>
+      <RouterProvider router={router} />
+    </Suspense>
+  );
 }
