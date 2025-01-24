@@ -15,7 +15,7 @@ const RECORD_ENV = 'LOCAL';
 const PAGE_NUM = 15;
 const URL = RECORD_ENV === 'LOCAL' ? `http://localhost:5173/` : `https://road-to-friendly.kro.kr/`;
 
-const RECORD_DURATION = 15000;
+const RECORD_DURATION = 10000;
 const INPUT_DELAY = 500;
 const INPUT_START_DELAY = 500;
 
@@ -103,6 +103,15 @@ async function startGame(hostPage) {
   return startButton.click();
 }
 
+async function waitForInputField(pageList) {
+  for (let i = 0; i < pageList.length; i++) {
+    const page = pageList[i];
+    await page.waitForFunction(() => {
+      return document.body.querySelector('input');
+    });
+  }
+}
+
 function startTracing(pageList) {
   const hostPage = pageList[0];
   const inputSelector = 'input[placeholder="답변을 입력해주세요"]';
@@ -149,6 +158,7 @@ const roomURL = await openRoom(hostPage);
 await enterRoom(pageList, roomURL);
 
 await startGame(hostPage);
+await waitForInputField(pageList);
 await startTracing(pageList);
 await browser.disconnect();
 process.exit(0);
