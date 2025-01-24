@@ -8,6 +8,7 @@ import { useSocketStore } from '@/stores';
 import { useKeywordsStore } from '@/stores/keywords';
 import { keywordStyleMap, scaleIn, Variables } from '@/styles';
 import { Group, Keyword, KeywordInfo, KeywordsCoordinates, PrefixSum } from '@/types';
+import { KEYWORDS_PROCESS_INTERVAL } from '@/constants/keywords';
 
 interface KeywordsViewProps {
   questionId: number;
@@ -66,7 +67,7 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
           updateTimeout = setTimeout(() => {
             processQueue();
             updateTimeout = undefined;
-          }, 1500);
+          }, KEYWORDS_PROCESS_INTERVAL);
         }
       });
     }
