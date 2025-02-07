@@ -97,7 +97,7 @@ const ContentSharePhaseViewStyle = css([
     borderRadius: 24,
     transform: 'scale(1)',
 
-    '@media (min-height: 768px) and (max-height: 1200px)': {
+    '@media (max-height: 1200px)': {
       transform: 'scale(0.7)'
     }
   },
