@@ -87,7 +87,21 @@ const QnAPhaseView = () => {
       socket.on('empathy:start', (response: { questions: Question[] }) => {
         setQuestions(response.questions);
         if (response.questions.length > 0) {
-          const firstQuestionTimeLeft = getRemainingSeconds(new Date(response.questions[0].expirationTime), new Date());
+          // 현재 시각에 표시되어야 하는 순서의 질문부터 시작
+          const now = new Date();
+          const firstQuestionIndex = response.questions.findIndex(
+            (question) => new Date(question.expirationTime) > now
+          );
+          // QnA가 이미 끝난 시간인 경우 통계 페이지로 이동
+          if (firstQuestionIndex === -1) {
+            navigate(`/rooms/${params.roomId}/statistics`);
+            return;
+          }
+          const firstQuestionTimeLeft = getRemainingSeconds(
+            new Date(response.questions[firstQuestionIndex].expirationTime),
+            new Date()
+          );
+          setCurrentQuestionIndex(firstQuestionIndex);
           setTimeLeft(firstQuestionTimeLeft);
           setInitialTimeLeft(firstQuestionTimeLeft);
         }
