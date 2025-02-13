@@ -44,7 +44,7 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
     const hostId = this.roomsService.setHostIfHostUndefined(roomId, client.id);
 
     client.data.roomId = roomId;
-    client.data.nickname = this.clientsService.randomNickname();
+    this.setNickname(client);
 
     this.server.to(roomId).emit('participant:join', {
       participantId: client.id,
@@ -64,6 +64,21 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
     const roomsJoinDto = { participants, hostId };
 
     return { status: 'ok', body: roomsJoinDto };
+  }
+
+  private setNickname(client: any) {
+    const session = client.request.session;
+    const nickname = session.nickname;
+
+    if (nickname) {
+      client.data.nickname = nickname;
+      return;
+    }
+
+    const randomNickname = this.clientsService.randomNickname();
+    session.nickname = randomNickname;
+    session.save();
+    client.data.nickname = randomNickname;
   }
 
   @UseGuards(ParticipantGuard)
