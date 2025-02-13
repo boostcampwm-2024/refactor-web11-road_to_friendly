@@ -1,7 +1,6 @@
 import { EventEmitter } from 'node:events';
 import { Injectable, OnModuleInit } from '@nestjs/common';
-
-const TIME_OUT = 5_000;
+import { SECOND } from '../definition/time';
 
 @Injectable()
 export class LazyDeleteRoomEventOperator extends EventEmitter implements OnModuleInit {
@@ -9,7 +8,7 @@ export class LazyDeleteRoomEventOperator extends EventEmitter implements OnModul
 
   onModuleInit(): any {
     this.on('lazy-delete-room', (roomId: string) => {
-      this.lazyDeleteInfo.set(roomId, setTimeout(() => this.lazyDelete(roomId), TIME_OUT));
+      this.lazyDeleteInfo.set(roomId, setTimeout(() => this.lazyDelete(roomId), 5 * SECOND));
     });
 
     this.on('cancel-lazy-delete-room', (roomId: string) => {
