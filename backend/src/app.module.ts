@@ -29,7 +29,7 @@ import { LazyDeleteRoomEventOperator } from './common/event/lazy-delete-room-eve
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${(process.env.NODE_ENV || 'dev').trim()}`,
+      envFilePath: `.env.${(process.env.NODE_ENV || 'sample').trim()}`,
       validationOptions: {
         abortEarly: true,
       },
