@@ -17,6 +17,7 @@ import { SocketCustomExceptionFilter } from '../../common/filter/socket.custom-e
 import { ExistGuard } from '../../common/guard/exist.guard';
 import { ClientsService } from '../../clients/service/clients.service';
 import { PhaseReadyGuard } from '../../common/guard/phase.guard';
+import { LazyDeleteRoomEventOperator } from '../../common/event/lazy-delete-room-event-operator';
 
 @WebSocketGateway()
 @UseFilters(SocketCustomExceptionFilter)
@@ -27,12 +28,11 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
   constructor(
     private readonly roomsService: RoomsService,
     private readonly clientsService: ClientsService,
+    private readonly lazyDeleteRoomEventOperator: LazyDeleteRoomEventOperator,
   ) {}
 
   onModuleInit() {
-    const adapter = this.server.of('/').adapter;
-
-    adapter.on('delete-room', (roomId) => {
+    this.lazyDeleteRoomEventOperator.on('delete-room', (roomId) => {
       this.roomsService.deleteRoom(roomId);
     });
   }
@@ -73,6 +73,7 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
     const clients = this.server.sockets.adapter.rooms.get(roomId);
 
     if (clients === undefined || clients.size === 0) {
+      this.roomsService.setHost(roomId, '');
       return;
     }
 
