@@ -92,11 +92,6 @@ const QnAPhaseView = () => {
           const firstQuestionIndex = response.questions.findIndex(
             (question) => new Date(question.expirationTime) > now
           );
-          // QnA가 이미 끝난 시간인 경우 통계 페이지로 이동
-          if (firstQuestionIndex === -1) {
-            navigate(`/rooms/${params.roomId}/statistics`);
-            return;
-          }
           const firstQuestionTimeLeft = getRemainingSeconds(
             new Date(response.questions[firstQuestionIndex].expirationTime),
             new Date()
@@ -121,7 +116,7 @@ const QnAPhaseView = () => {
       timerWorker.current?.postMessage({ action: 'stop' }); // 타이머 중지
 
       if (questions.length > 0) {
-        navigate(`/rooms/${params.roomId}/statistics`);
+        navigate(`/rooms/${params.roomId}/statistics`, { state: { navigatedFromPreviousPhase: true } });
       }
     }
 

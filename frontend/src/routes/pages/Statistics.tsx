@@ -30,7 +30,7 @@ const StatisticsPhaseView = () => {
       setTimeout(() => {
         setIsFadingOut(true);
         setTimeout(() => {
-          navigate(`/rooms/${params.roomId}/content-share`);
+          navigate(`/rooms/${params.roomId}/content-share`, { state: { navigatedFromPreviousPhase: true } });
         }, 1000);
       }, 2000);
     } else {
