@@ -16,11 +16,12 @@ const PAGE_NUM = 15;
 const URL = RECORD_ENV === 'LOCAL' ? `http://localhost:5173/` : `https://road-to-friendly.kro.kr/`;
 
 const RECORD_DURATION = 10000;
+const RECORD_START_DELAY = 10000;
 const INPUT_DELAY = 500;
 const INPUT_START_DELAY = 500;
 
 const MAX_KEYWORDS_NUM = 50;
-const KEYWORDS_PROCESS_INTERVAL = 300;
+const KEYWORDS_PROCESS_INTERVAL = 700;
 
 const OPTION = {
   headless: false,
@@ -113,7 +114,7 @@ async function waitForInputField(pageList) {
   }
 }
 
-function startTracing(pageList) {
+async function startTracing(pageList) {
   const hostPage = pageList[0];
   const inputSelector = 'input[placeholder="답변을 입력해주세요"]';
 
@@ -135,6 +136,9 @@ function startTracing(pageList) {
   }
 
   const intervalPromiseList = startInput();
+
+  await delay(RECORD_START_DELAY);
+
   hostPage.tracing.start(TRACING_OPTION);
   const tracingPromise = new Promise(async (resolve) => {
     await delay(RECORD_DURATION);
