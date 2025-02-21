@@ -85,14 +85,14 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
     const wordsOffsetValuesMap: Record<string, OffsetValues> = {};
     if (!container || wordArray.length === 0) return;
 
-    // 컨테이너 초기화
-    container.innerHTML = '';
-
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
     const containerCenterX = containerWidth / 2.0;
     const containerCenterY = containerHeight / 2.0;
     const containerAspectRatio = containerWidth / containerHeight;
+
+    // 컨테이너 초기화
+    container.innerHTML = '';
 
     const hitTest = (elem: HTMLElement, other_elems: HTMLElement[]): boolean => {
       // 추가할 키워드 엘리먼트의 offset 정보 캐싱
