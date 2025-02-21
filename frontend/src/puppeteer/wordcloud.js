@@ -24,7 +24,8 @@ const KEYWORDS_PROCESS_INTERVAL = 300;
 
 const OPTION = {
   headless: false,
-  args: ['--disable-backgrounding-occluded-windows', '--disable-background-timer-throttling']
+  args: ['--start-maximized', '--disable-backgrounding-occluded-windows', '--disable-background-timer-throttling'],
+  defaultViewport: null
 };
 
 const TRACING_OPTION = {
