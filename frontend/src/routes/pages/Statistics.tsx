@@ -1,6 +1,6 @@
 import { css, keyframes } from '@emotion/react';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { useToast } from '@/hooks';
 import LoadingPage from '@/routes/pages/LoadingPage';
@@ -17,6 +17,8 @@ const StatisticsPhaseView = () => {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
+  const location = useLocation();
+  const { navigatedFromPreviousPhase } = location.state || { navigatedFromPreviousPhase: false };
 
   const handleResult = (response: CommonResult) => {
     if (response) {
@@ -40,6 +42,11 @@ const StatisticsPhaseView = () => {
 
   useEffect(() => {
     socket.on('empathy:result', handleResult);
+
+    // 재접속한 경우라고 판단되면 통계 요청
+    if (socket && !navigatedFromPreviousPhase) {
+      socket.emit('client:request:statistics');
+    }
     return () => {
       socket.off('empathy:result', handleResult);
     };

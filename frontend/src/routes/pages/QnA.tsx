@@ -1,6 +1,6 @@
 import { css, keyframes } from '@emotion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ClockIcon from '@/assets/icons/clock.svg?react';
 import { MAX_LONG_RADIUS } from '@/constants/radius';
@@ -29,6 +29,8 @@ const QnAPhaseView = () => {
 
   const navigate = useNavigate();
   const params = useParams();
+  const location = useLocation();
+  const { navigatedFromPreviousPhase } = location.state || { navigatedFromPreviousPhase: false };
 
   const updateSelectedKeywords = useCallback(
     (keyword: string, type: 'add' | 'delete') => {
@@ -101,6 +103,11 @@ const QnAPhaseView = () => {
           setInitialTimeLeft(firstQuestionTimeLeft);
         }
       });
+    }
+
+    // 재접속한 경우라고 판단되면 질문 리스트 요청
+    if (socket && !navigatedFromPreviousPhase) {
+      socket.emit('client:request:questions');
     }
   }, [socket, setQuestions]);
 
