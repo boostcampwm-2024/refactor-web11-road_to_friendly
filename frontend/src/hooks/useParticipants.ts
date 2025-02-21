@@ -4,16 +4,19 @@ import { useSocketStore, useParticipantsStore } from '@/stores';
 import { ParticipantItem } from '@/types';
 import { convertArrayToObject } from '@/utils';
 
+import { Phases } from '../../../common/phases';
+
 const useParticipants = (roomId: string | null, finishInitialLoading: () => void) => {
   const { socket, connect, disconnect } = useSocketStore();
   const { hostId, setHostId, participants, setParticipants } = useParticipantsStore();
   const [roomExists, setRoomExists] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [phaseOnInitialConnent, setPhaseOnInitialConnent] = useState<Phases | null>(null);
 
   // 참가자 목록 응답 처리
   const handleJoinResponse = (response: {
     status: string;
-    body: { participants: ParticipantItem[]; hostId: string };
+    body: { participants: ParticipantItem[]; hostId: string; phase: Phases };
   }) => {
     setRoomExists(response.status === 'ok');
     if (response.status === 'ok') {
@@ -25,6 +28,7 @@ const useParticipants = (roomId: string | null, finishInitialLoading: () => void
 
       setParticipants(convertArrayToObject(participantsWithIndex));
       setHostId(response.body.hostId);
+      setPhaseOnInitialConnent(response.body.phase);
       finishInitialLoading();
     }
     setCurrentUserId(socket?.id || null);
@@ -89,7 +93,7 @@ const useParticipants = (roomId: string | null, finishInitialLoading: () => void
     }
   }, [socket, roomId, connect, disconnect]);
 
-  return { participants, hostId, currentUserId, roomExists };
+  return { participants, hostId, currentUserId, roomExists, phaseOnInitialConnent };
 };
 
 export default useParticipants;
