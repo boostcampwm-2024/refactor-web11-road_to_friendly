@@ -15,16 +15,18 @@ const RECORD_ENV = 'LOCAL';
 const PAGE_NUM = 15;
 const URL = RECORD_ENV === 'LOCAL' ? `http://localhost:5173/` : `https://road-to-friendly.kro.kr/`;
 
-const RECORD_DURATION = 15000;
+const RECORD_DURATION = 10000;
+const RECORD_START_DELAY = 10000;
 const INPUT_DELAY = 500;
 const INPUT_START_DELAY = 500;
 
 const MAX_KEYWORDS_NUM = 50;
-const KEYWORDS_PROCESS_INTERVAL = 300;
+const KEYWORDS_PROCESS_INTERVAL = 700;
 
 const OPTION = {
   headless: false,
-  args: ['--disable-backgrounding-occluded-windows', '--disable-background-timer-throttling']
+  args: ['--start-maximized', '--disable-backgrounding-occluded-windows', '--disable-background-timer-throttling'],
+  defaultViewport: null
 };
 
 const TRACING_OPTION = {
@@ -103,7 +105,16 @@ async function startGame(hostPage) {
   return startButton.click();
 }
 
-function startTracing(pageList) {
+async function waitForInputField(pageList) {
+  for (let i = 0; i < pageList.length; i++) {
+    const page = pageList[i];
+    await page.waitForFunction(() => {
+      return document.body.querySelector('input');
+    });
+  }
+}
+
+async function startTracing(pageList) {
   const hostPage = pageList[0];
   const inputSelector = 'input[placeholder="답변을 입력해주세요"]';
 
@@ -125,6 +136,9 @@ function startTracing(pageList) {
   }
 
   const intervalPromiseList = startInput();
+
+  await delay(RECORD_START_DELAY);
+
   hostPage.tracing.start(TRACING_OPTION);
   const tracingPromise = new Promise(async (resolve) => {
     await delay(RECORD_DURATION);
@@ -149,6 +163,7 @@ const roomURL = await openRoom(hostPage);
 await enterRoom(pageList, roomURL);
 
 await startGame(hostPage);
+await waitForInputField(pageList);
 await startTracing(pageList);
 await browser.disconnect();
 process.exit(0);

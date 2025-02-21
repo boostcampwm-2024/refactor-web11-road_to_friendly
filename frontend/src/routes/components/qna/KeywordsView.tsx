@@ -85,24 +85,16 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
     const wordsOffsetValuesMap: Record<string, OffsetValues> = {};
     if (!container || wordArray.length === 0) return;
 
-    // 컨테이너 초기화
-    container.innerHTML = '';
-
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
     const containerCenterX = containerWidth / 2.0;
     const containerCenterY = containerHeight / 2.0;
     const containerAspectRatio = containerWidth / containerHeight;
 
-    const hitTest = (elem: HTMLElement, other_elems: HTMLElement[]): boolean => {
-      // 추가할 키워드 엘리먼트의 offset 정보 캐싱
-      const A_offsetValeus: OffsetValues = {
-        offsetLeft: elem.offsetLeft,
-        offsetTop: elem.offsetTop,
-        offsetWidth: elem.offsetWidth,
-        offsetHeight: elem.offsetHeight
-      };
+    // 컨테이너 초기화
+    container.innerHTML = '';
 
+    const hitTest = (newElemenetOffsetValues: OffsetValues, other_elems: HTMLElement[]): boolean => {
       const overlapTest = (a: OffsetValues, b: OffsetValues, gap: number) => {
         if (
           Math.abs(a.offsetLeft + a.offsetWidth / 2 - b.offsetLeft - b.offsetWidth / 2) <
@@ -121,7 +113,7 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
 
       let i = 0;
       for (i = 0; i < other_elems.length; i++) {
-        if (overlapTest(A_offsetValeus, wordsOffsetValuesMap[other_elems[i].innerText], 4)) return true;
+        if (overlapTest(newElemenetOffsetValues, wordsOffsetValuesMap[other_elems[i].textContent], 4)) return true;
       }
       return false;
     };
@@ -152,8 +144,8 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
       // TODO: 클릭 핸들러 붙이기
       wordSpan.addEventListener('click', () => {});
 
-      const width = wordSpan.offsetWidth;
-      const height = wordSpan.offsetHeight;
+      const width = 0;
+      const height = 0;
       let left = containerCenterX - width / 2;
       let top = containerCenterY - height / 2;
 
@@ -169,41 +161,53 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
         min-width: 60px;
         transition: font-size 0.3s ease;
       `;
-
       wordSpan.style.cssText = wordSpanStyle;
-      container.appendChild(wordSpan);
 
-      while (hitTest(wordSpan, alreadyPlacedWords)) {
+      const fontSize = weight < 2 ? 16 : weight * 12;
+      const estimatedWidth = fontSize * 0.75 * word.keyword.length + 24;
+      const estimatedHeight = Math.max(16, fontSize) + 11.2;
+
+      const wordSpanOffsetValues: OffsetValues = {
+        offsetLeft: left,
+        offsetTop: top,
+        offsetWidth: estimatedWidth,
+        offsetHeight: estimatedHeight
+      };
+
+      while (hitTest(wordSpanOffsetValues, alreadyPlacedWords)) {
         radius += step;
         angle += (index % 2 === 0 ? 1 : -1) * step;
         left = containerCenterX - width / 2 + radius * Math.cos(angle) * containerAspectRatio;
         top = containerCenterY + radius * Math.sin(angle) - height / 2.0;
-        wordSpan.style.left = `${left}px`;
-        wordSpan.style.top = `${top}px`;
+        wordSpanOffsetValues.offsetLeft = left;
+        wordSpanOffsetValues.offsetTop = top;
       }
 
-      // 컨테이너를 벗어나는 단어는 제거
+      // 컨테이너를 벗어나는 단어는 추가하지 않음
       if (left < 0 || top < 0 || left + width > containerWidth || top + height > containerHeight) {
-        container.removeChild(wordSpan);
         return;
       }
 
       // 첫번째 키워드를 정중앙에 위치시키기 위해 조정
       if (index === 0) {
-        left -= wordSpan.offsetWidth / 2;
-        top -= wordSpan.offsetHeight / 2;
-        wordSpan.style.left = `${left}px`;
-        wordSpan.style.top = `${top}px`;
+        left -= wordSpanOffsetValues.offsetWidth / 2;
+        top -= wordSpanOffsetValues.offsetHeight / 2;
       }
+
+      wordSpan.style.left = `${left}px`;
+      wordSpan.style.top = `${top}px`;
+
+      container.appendChild(wordSpan);
 
       alreadyPlacedWords.push(wordSpan);
       // 키워드 엘리먼트의 offset 정보 캐싱
       wordsOffsetValuesMap[word.keyword] = {
-        offsetLeft: wordSpan.offsetLeft,
-        offsetTop: wordSpan.offsetTop,
+        offsetLeft: left,
+        offsetTop: top,
         offsetWidth: wordSpan.offsetWidth,
         offsetHeight: wordSpan.offsetHeight
       };
+
       updatedKeywordsCoordinates[word.keyword] = { x: left, y: top, count: word.count };
       return wordSpan;
     };
