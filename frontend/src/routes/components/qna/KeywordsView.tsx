@@ -152,8 +152,8 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
       // TODO: 클릭 핸들러 붙이기
       wordSpan.addEventListener('click', () => {});
 
-      const width = wordSpan.offsetWidth;
-      const height = wordSpan.offsetHeight;
+      const width = 0;
+      const height = 0;
       let left = containerCenterX - width / 2;
       let top = containerCenterY - height / 2;
 
@@ -169,9 +169,7 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
         min-width: 60px;
         transition: font-size 0.3s ease;
       `;
-
       wordSpan.style.cssText = wordSpanStyle;
-      container.appendChild(wordSpan);
 
       while (hitTest(wordSpan, alreadyPlacedWords)) {
         radius += step;
@@ -182,9 +180,8 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
         wordSpan.style.top = `${top}px`;
       }
 
-      // 컨테이너를 벗어나는 단어는 제거
+      // 컨테이너를 벗어나는 단어는 추가하지 않음
       if (left < 0 || top < 0 || left + width > containerWidth || top + height > containerHeight) {
-        container.removeChild(wordSpan);
         return;
       }
 
@@ -196,11 +193,13 @@ const KeywordsView = memo(({ questionId, selectedKeywords, updateSelectedKeyword
         wordSpan.style.top = `${top}px`;
       }
 
+      container.appendChild(wordSpan);
+
       alreadyPlacedWords.push(wordSpan);
       // 키워드 엘리먼트의 offset 정보 캐싱
       wordsOffsetValuesMap[word.keyword] = {
-        offsetLeft: wordSpan.offsetLeft,
-        offsetTop: wordSpan.offsetTop,
+        offsetLeft: left,
+        offsetTop: top,
         offsetWidth: wordSpan.offsetWidth,
         offsetHeight: wordSpan.offsetHeight
       };
