@@ -108,6 +108,7 @@ async function startGame(hostPage) {
 async function waitForInputField(pageList) {
   for (let i = 0; i < pageList.length; i++) {
     const page = pageList[i];
+    await page.bringToFront();
     await page.waitForFunction(() => {
       return document.body.querySelector('input');
     });
@@ -116,6 +117,8 @@ async function waitForInputField(pageList) {
 
 async function startTracing(pageList) {
   const hostPage = pageList[0];
+  await hostPage.bringToFront();
+
   const inputSelector = 'input[placeholder="답변을 입력해주세요"]';
 
   let intervalCntList = [];
