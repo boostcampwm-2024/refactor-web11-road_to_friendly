@@ -157,12 +157,14 @@ const QnAPhaseView = () => {
               />
               <div css={progressWrapperStyle}>
                 <ClockIcon width="35px" height="35px" fill="#000" />
-                <progress
-                  id="progress"
-                  value={initialTimeLeft > 0 ? (timeLeft / initialTimeLeft) * 100 : 100}
-                  max={100}
-                  css={progressBarStyle}
-                />
+                <div css={progressBarStyle}>
+                  <div
+                    style={{
+                      transform: `scaleX(${initialTimeLeft > 0 ? timeLeft / initialTimeLeft : 1})`
+                    }}
+                    css={progressBarValueStyle}
+                  ></div>
+                </div>
               </div>
             </div>
           )}
@@ -217,19 +219,14 @@ const progressBarStyle = css`
   width: 100%;
   height: 12px;
   border-radius: 50px;
-  background-color: #eee;
+  background-color: ${Variables.colors.surface_alt};
+  overflow: hidden;
+`;
 
-  ::-webkit-progress-bar {
-    background-color: ${Variables.colors.surface_alt};
-    border-radius: 50px;
-    height: 12px;
-    overflow: hidden;
-  }
-
-  ::-webkit-progress-value {
-    background-color: ${Variables.colors.surface_strong};
-    border-radius: 50px;
-    height: 12px;
-    transition: width 1s linear;
-  }
+const progressBarValueStyle = css`
+  background-color: ${Variables.colors.surface_strong};
+  border-radius: 50px;
+  height: 12px;
+  transition: transform 1s linear;
+  transform-origin: left;
 `;
