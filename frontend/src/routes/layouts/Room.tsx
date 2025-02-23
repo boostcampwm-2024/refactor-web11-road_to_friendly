@@ -26,7 +26,10 @@ const RoomLayout = () => {
   const params = useParams();
   const locaton = useLocation();
 
-  const { participants, hostId, currentUserId, roomExists } = useParticipants(roomId, finishInitialLoading);
+  const { participants, hostId, currentUserId, roomExists, phaseOnInitialConnent } = useParticipants(
+    roomId,
+    finishInitialLoading
+  );
   const { radius, setRadius, increaseRadius } = useRadiusStore();
   useCheckRoomAccess();
 
@@ -79,11 +82,11 @@ const RoomLayout = () => {
 
   if (!roomExists) showBoundary(new Error(roomError.RoomNotFound));
 
-  // URL이 정확히 /rooms/:roomId 인 경우 join 페이지로 이동
+  // 서버로부터 받은 현재 Phase에 해당하는 페이지로 이동
   useEffect(() => {
     if (!initialLoading) {
-      if (location.pathname.endsWith(params.roomId)) {
-        navigate('join', { replace: true });
+      if (location.pathname.endsWith(params.roomId) && phaseOnInitialConnent !== null) {
+        navigate(phaseOnInitialConnent, { replace: true });
       }
     }
   }, [initialLoading, params.roomId, locaton.pathname, navigate]);

@@ -16,7 +16,7 @@ const JoinPhaseView = () => {
   useEffect(() => {
     socket.on('host:start:ack', (response: { status: string; message: string }) => {
       if (response.status === 'ready') {
-        navigate(`/rooms/${params.roomId}/questions`);
+        navigate(`/rooms/${params.roomId}/questions`, { state: { navigatedFromPreviousPhase: true } });
       }
     });
 

@@ -86,7 +86,7 @@ const profileStyle = (x: number, y: number, shortRadius: number, longRadius: num
   transition: opacity 0.5s ease-in-out;
   ${flexStyle(10, 'column', 'center', 'center')};
 
-  @media (min-height: 768px) and (max-height: 1200px) {
+  @media (max-height: 1200px) {
     transform: translate(-50%, 50%) scale(0.8);
   }
 `;

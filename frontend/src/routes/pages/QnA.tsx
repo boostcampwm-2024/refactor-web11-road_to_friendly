@@ -1,6 +1,6 @@
 import { css, keyframes } from '@emotion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ClockIcon from '@/assets/icons/clock.svg?react';
 import { MAX_LONG_RADIUS } from '@/constants/radius';
@@ -29,6 +29,8 @@ const QnAPhaseView = () => {
 
   const navigate = useNavigate();
   const params = useParams();
+  const location = useLocation();
+  const { navigatedFromPreviousPhase } = location.state || { navigatedFromPreviousPhase: false };
 
   const updateSelectedKeywords = useCallback(
     (keyword: string, type: 'add' | 'delete') => {
@@ -87,11 +89,25 @@ const QnAPhaseView = () => {
       socket.on('empathy:start', (response: { questions: Question[] }) => {
         setQuestions(response.questions);
         if (response.questions.length > 0) {
-          const firstQuestionTimeLeft = getRemainingSeconds(new Date(response.questions[0].expirationTime), new Date());
+          // 현재 시각에 표시되어야 하는 순서의 질문부터 시작
+          const now = new Date();
+          const firstQuestionIndex = response.questions.findIndex(
+            (question) => new Date(question.expirationTime) > now
+          );
+          const firstQuestionTimeLeft = getRemainingSeconds(
+            new Date(response.questions[firstQuestionIndex].expirationTime),
+            new Date()
+          );
+          setCurrentQuestionIndex(firstQuestionIndex);
           setTimeLeft(firstQuestionTimeLeft);
           setInitialTimeLeft(firstQuestionTimeLeft);
         }
       });
+    }
+
+    // 재접속한 경우라고 판단되면 질문 리스트 요청
+    if (socket && !navigatedFromPreviousPhase) {
+      socket.emit('client:request:questions');
     }
   }, [socket, setQuestions]);
 
@@ -107,7 +123,7 @@ const QnAPhaseView = () => {
       timerWorker.current?.postMessage({ action: 'stop' }); // 타이머 중지
 
       if (questions.length > 0) {
-        navigate(`/rooms/${params.roomId}/statistics`);
+        navigate(`/rooms/${params.roomId}/statistics`, { state: { navigatedFromPreviousPhase: true } });
       }
     }
 

@@ -1,23 +1,28 @@
 import { css } from '@emotion/react';
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import StopIcon from '@/assets/icons/stop.svg?react';
 import { useToast } from '@/hooks';
 import { sendShareStopRequest } from '@/services';
 import { useParticipantsStore, useSocketStore } from '@/stores';
 import { flexStyle, Variables } from '@/styles';
-import { Content, NextContentResponse, WaitingQueueResponse } from '@/types';
+import { CommonResult, Content, NextContentResponse, WaitingQueueResponse } from '@/types';
+import { ContentShareProgressOnRefresh } from '@/types/response';
 
 import { ContentPresentSection, WaitingListEmpty, WaitingListInfo } from '../components/content-share/index';
 
 const ContentSharePhaseView = () => {
   const { socket, connect } = useSocketStore();
   const { openToast } = useToast();
-  const { hostId } = useParticipantsStore();
+  const { hostId, setParticipants } = useParticipantsStore();
   const [currentContent, setCurrentContent] = useState<Content | null>(null);
   const [numberOfWaiters, setNumberOfWaiters] = useState(0);
 
   const prevVolumeRef = useRef<number | null>(null);
+
+  const location = useLocation();
+  const { navigatedFromPreviousPhase } = location.state || { navigatedFromPreviousPhase: false };
 
   const stopSharing = async () => {
     try {
@@ -50,6 +55,37 @@ const ContentSharePhaseView = () => {
       });
 
       socket.on('share:interest:add', (response: WaitingQueueResponse) => setNumberOfWaiters(response.nowQueueSize));
+
+      //// 재접속 로직 ////
+      // (재접속한 경우에만 실행됨) 통계결과 표시
+      socket.on('empathy:result', (response: CommonResult) => {
+        Object.entries(response).forEach(([userId, array]) => {
+          setParticipants((prev) => ({ ...prev, [userId]: { ...prev[userId], keywords: array } }));
+        });
+      });
+
+      // (재접속한 경우에만 실행됨) 공유 컨텐츠 정보 표시
+      socket.on('share:interest:progress', (response: ContentShareProgressOnRefresh) => {
+        const { content, nowQueueSize } = response;
+
+        setCurrentContent(
+          content !== null
+            ? {
+                sharerSocketId: content.participantId,
+                type: content.resourceType,
+                resourceURL: content.resourceUrl
+              }
+            : null
+        );
+
+        setNumberOfWaiters(nowQueueSize);
+      });
+
+      // 재접속한 경우라고 판단되면 통계 결과 및 컨텐츠 공유 상황 요청
+      if (socket && !navigatedFromPreviousPhase) {
+        socket.emit('client:request:statistics');
+        socket.emit('client:request:sharing-content');
+      }
     } else {
       connect();
     }
@@ -58,6 +94,8 @@ const ContentSharePhaseView = () => {
       if (socket) {
         socket.off('share:interest:broadcast');
         socket.off('share:interest:add');
+        socket.off('client:request:statistics');
+        socket.off('client:request:sharing-content');
       }
     };
   }, [socket, connect]);
@@ -97,7 +135,7 @@ const ContentSharePhaseViewStyle = css([
     borderRadius: 24,
     transform: 'scale(1)',
 
-    '@media (min-height: 768px) and (max-height: 1200px)': {
+    '@media (max-height: 1200px)': {
       transform: 'scale(0.7)'
     }
   },

@@ -20,12 +20,14 @@ const RoomCreateButton = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       });
 
       if (response.status === 200) {
-        const roomUrl = new URL(response.url);
-        if (roomUrl) navigate(roomUrl.pathname);
+        const json = await response.json();
+        const roomId = json.roomId;
+        if (roomId) navigate(`/rooms/${roomId}`);
       } else {
         openToast({ text: '서버와 통신 중 에러가 발생했습니다!', type: 'error' });
       }
