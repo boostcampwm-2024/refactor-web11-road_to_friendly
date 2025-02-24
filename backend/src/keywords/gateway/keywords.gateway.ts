@@ -8,20 +8,22 @@ import { KeywordsService } from '../service/keywords.service';
 import { KeywordsAlertDto } from '../dto/keywords.alert.dto';
 import { PhaseKeywordGuard } from '../../common/guard/phase.guard';
 import { SocketCustomExceptionFilter } from '../../common/filter/socket.custom-exception.filter';
+import { LazyDeleteRoomEventOperator } from '../../common/event/lazy-delete-room-event-operator';
 
 @WebSocketGateway()
 @UseGuards(PhaseKeywordGuard)
 @UseFilters(SocketCustomExceptionFilter)
 export class KeywordsGateway implements OnModuleInit {
-  constructor(private readonly keywordsService: KeywordsService) {}
+  constructor(
+    private readonly keywordsService: KeywordsService,
+    private readonly lazyDeleteRoomEventOperator: LazyDeleteRoomEventOperator,
+  ) {}
 
   @WebSocketServer()
   server: Server;
 
   onModuleInit() {
-    const adapter = this.server.of('/').adapter;
-
-    adapter.on('delete-room', (roomId) => {
+    this.lazyDeleteRoomEventOperator.on('delete-room', (roomId) => {
       this.keywordsService.deleteRoomKeywordsInfo(roomId);
     });
   }

@@ -20,9 +20,13 @@ export class ClientsGateway {
 
   @UseGuards(ParticipantGuard)
   @SubscribeMessage('client:update')
-  updateClientInfo(@ConnectedSocket() client: Socket, @MessageBody() { nickname }): void {
+  updateClientInfo(@ConnectedSocket() client: any, @MessageBody() { nickname }): void {
+    nickname = nickname.trim();
+    const session = client.request.session;
     const roomId = client.data.roomId;
-    client.data.nickname = nickname.trim();
+    session.nickname = nickname;
+    session.save();
+    client.data.nickname = nickname;
 
     this.server.to(roomId).emit('participant:info:update', { participantId: client.id, nickname });
   }

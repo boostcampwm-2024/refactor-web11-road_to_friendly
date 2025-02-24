@@ -23,12 +23,13 @@ import { InterestsRepositoryProvider } from './interests/repository/interests.re
 import { InterestsInMemoryRepository } from './interests/repository/interests.in-memory.repository';
 import { CustomValidationPipe } from './interests/pipe/custom-validation.pipe';
 import { IsYoutubeLinkConstraint } from './interests/decorator/is-youtube-link.decorator';
+import { LazyDeleteRoomEventOperator } from './common/event/lazy-delete-room-event-operator';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${(process.env.NODE_ENV || 'dev').trim()}`,
+      envFilePath: `.env.${(process.env.NODE_ENV || 'sample').trim()}`,
       validationOptions: {
         abortEarly: true,
       },
@@ -58,6 +59,7 @@ import { IsYoutubeLinkConstraint } from './interests/decorator/is-youtube-link.d
     InterestsRepositoryProvider,
     CustomValidationPipe,
     IsYoutubeLinkConstraint,
+    LazyDeleteRoomEventOperator,
   ],
   exports: ['INTERESTS_IMAGE_REPOSITORY'],
 })

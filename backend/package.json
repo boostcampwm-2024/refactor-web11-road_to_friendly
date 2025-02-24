@@ -33,6 +33,7 @@
     "aws-sdk": "^2.1692.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "express-session": "^1.18.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "uuid": "^11.0.2"
@@ -45,6 +46,7 @@
     "@stylistic/eslint-plugin": "^2.11.0",
     "@types/async-lock": "^1.4.2",
     "@types/express": "^5.0.0",
+    "@types/express-session": "^1.18.1",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
     "@types/supertest": "^6.0.0",
