@@ -1,19 +1,19 @@
 import { roomError } from '@/constants/roomError';
 import { useEffect, useState } from 'react';
 
-const IS_PRODUCTION = import.meta.env.MODE === 'production' || true;
+const IS_PRODUCTION = import.meta.env.MODE === 'production';
 const TIMEOUT = 150;
 
 const accessChannel = new BroadcastChannel('accessChannel');
+
+const disconnect = () => {
+  accessChannel.onmessage = null;
+};
 
 export const useCheckRoomAccess = () => {
   if (!IS_PRODUCTION) return;
 
   const [canAccess, setCanAccess] = useState<boolean | null>(null);
-
-  const disconnect = () => {
-    accessChannel.onmessage = null;
-  };
 
   useEffect(() => {
     return () => disconnect();

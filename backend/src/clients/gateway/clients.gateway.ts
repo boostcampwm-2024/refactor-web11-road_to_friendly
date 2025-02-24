@@ -20,20 +20,30 @@ export class ClientsGateway {
 
   @UseGuards(ParticipantGuard)
   @SubscribeMessage('client:update')
-  updateClientInfo(@ConnectedSocket() client: Socket, @MessageBody() { nickname }): void {
+  updateClientInfo(@ConnectedSocket() client: any, @MessageBody() { nickname }): void {
+    nickname = nickname.trim();
+    const session = client.request.session;
     const roomId = client.data.roomId;
-    client.data.nickname = nickname.trim();
+    session.nickname = nickname;
+    session.save();
+    client.data.nickname = nickname;
 
     this.server.to(roomId).emit('participant:info:update', { participantId: client.id, nickname });
   }
 
   @UseGuards(ParticipantGuard, HostGuard, PhaseReadyGuard)
   @SubscribeMessage('client:host:start')
-  startToEmpathise(@ConnectedSocket() client: Socket): void {
+  async startToEmpathise(@ConnectedSocket() client: Socket): Promise<void> {
     const roomId = client.data.roomId;
     this.roomsService.setPhase(roomId, PHASE.KEYWORD);
 
     const empathyTopics = this.roomsService.getEmpathyTopics();
+
+    // QnA 시작 요청 수신 완료 메시지 전송
+    this.server.to(roomId).emit('host:start:ack', { status: 'ready', message: 'client:host:start message received' });
+
+    // 질문 리스트 전송 전에 2초 대기
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     this.server.to(roomId).emit('empathy:start', { questions: empathyTopics });
 
