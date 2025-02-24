@@ -24,7 +24,7 @@ const RoomCreateButton = () => {
         credentials: 'include'
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         const json = await response.json();
         const roomId = json.roomId;
         if (roomId) navigate(`/rooms/${roomId}`);
