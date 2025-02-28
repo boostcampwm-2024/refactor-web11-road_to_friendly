@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ModalWithOverlay } from '@/routes/components/common';
+import { ModalWithOverlay } from '@/components/common';
 
 export const useModal = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);

@@ -17,7 +17,6 @@ import { SocketCustomExceptionFilter } from '../../common/filter/socket.custom-e
 import { ExistGuard } from '../../common/guard/exist.guard';
 import { ClientsService } from '../../clients/service/clients.service';
 import { PhaseReadyGuard } from '../../common/guard/phase.guard';
-import { LazyDeleteRoomEventOperator } from '../../common/event/lazy-delete-room-event-operator';
 
 @WebSocketGateway()
 @UseFilters(SocketCustomExceptionFilter)
@@ -28,11 +27,12 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
   constructor(
     private readonly roomsService: RoomsService,
     private readonly clientsService: ClientsService,
-    private readonly lazyDeleteRoomEventOperator: LazyDeleteRoomEventOperator,
   ) {}
 
   onModuleInit() {
-    this.lazyDeleteRoomEventOperator.on('delete-room', (roomId) => {
+    const adapter = this.server.of('/').adapter;
+
+    adapter.on('delete-room', (roomId) => {
       this.roomsService.deleteRoom(roomId);
     });
   }
@@ -44,7 +44,7 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
     const hostId = this.roomsService.setHostIfHostUndefined(roomId, client.id);
 
     client.data.roomId = roomId;
-    this.setNickname(client);
+    client.data.nickname = this.clientsService.randomNickname();
 
     this.server.to(roomId).emit('participant:join', {
       participantId: client.id,
@@ -66,34 +66,13 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
     return { status: 'ok', body: roomsJoinDto };
   }
 
-  private setNickname(client: any) {
-    const session = client.request.session;
-    const nickname = session.nickname;
-
-    if (nickname) {
-      client.data.nickname = nickname;
-      return;
-    }
-
-    const randomNickname = this.clientsService.randomNickname();
-    session.nickname = randomNickname;
-    session.save();
-    client.data.nickname = randomNickname;
-  }
-
   @UseGuards(ParticipantGuard)
   handleDisconnect(client: Socket): void {
     const roomId = client.data.roomId;
 
-    if (roomId === undefined) {
-      // TODO: 여러 소켓에 대해 동작하는 이유 확인할 것
-      return;
-    }
-
     const clients = this.server.sockets.adapter.rooms.get(roomId);
 
     if (clients === undefined || clients.size === 0) {
-      this.roomsService.setHost(roomId, '');
       return;
     }
 

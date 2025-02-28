@@ -16,7 +16,6 @@ import { InterestsYoutubeControlResponseDto } from '../dto/interests.youtube.con
 import { INTERESTS_YOUTUBE_CONTROL, interestsYoutubeControl } from '../definition/interests.youtube.control';
 import { ValidateImageExtensionGuard } from '../guard/validate.image.extention.guard';
 import { CustomValidationPipe } from '../pipe/custom-validation.pipe';
-import { LazyDeleteRoomEventOperator } from '../../common/event/lazy-delete-room-event-operator';
 
 @WebSocketGateway()
 @UseFilters(SocketCustomExceptionFilter)
@@ -28,11 +27,12 @@ export class InterestsGateway implements OnModuleInit {
   constructor(
     private readonly interestsService: InterestsService,
     private readonly roomsService: RoomsService,
-    private readonly lazyDeleteRoomEventOperator: LazyDeleteRoomEventOperator,
   ) {}
 
   onModuleInit() {
-    this.lazyDeleteRoomEventOperator.on('delete-room', (roomId) => {
+    const adapter = this.server.of('/').adapter;
+
+    adapter.on('delete-room', (roomId) => {
       this.interestsService.deleteRoomInterest(roomId);
     });
   }
