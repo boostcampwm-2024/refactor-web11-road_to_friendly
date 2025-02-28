@@ -1,6 +1,6 @@
 import {
   ConnectedSocket,
-  MessageBody, OnGatewayConnection,
+  MessageBody,
   OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
@@ -61,7 +61,7 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
       };
     });
 
-    const roomsJoinDto = { participants, hostId, phase: "join" };
+    const roomsJoinDto = { participants, hostId };
 
     return { status: 'ok', body: roomsJoinDto };
   }
