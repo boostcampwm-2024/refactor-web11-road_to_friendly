@@ -13,9 +13,7 @@ export const useSocketStore = create<SocketStore>((set) => ({
   socket: null,
 
   connect: () => {
-    const socketInstance = io(config.SOCKET_SERVER_URL, {
-      withCredentials: true
-    });
+    const socketInstance = io(config.SOCKET_SERVER_URL);
     set({ socket: socketInstance });
   },
 

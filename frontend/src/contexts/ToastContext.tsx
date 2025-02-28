@@ -1,8 +1,9 @@
 import { createContext, useState } from 'react';
 
+import { Toast } from '@/components/common';
+
 import CheckIcon from '@/assets/icons/check.svg?react';
 import WarnIcon from '@/assets/icons/warn.svg?react';
-import { Toast } from '@/routes/components/common';
 import { Variables } from '@/styles';
 import { ToastOption, ToastProps } from '@/types';
 

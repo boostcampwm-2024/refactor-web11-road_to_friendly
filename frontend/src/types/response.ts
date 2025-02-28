@@ -22,11 +22,6 @@ export interface NextContentResponse {
   nowQueueSize: number;
 }
 
-export interface ContentShareProgressOnRefresh {
-  content: NextContentResponse | null;
-  nowQueueSize: number;
-}
-
 export type YoutubeRequestType = 'PLAY' | 'STOP' | 'TIMELINE' | 'SPEED' | 'DRAGGING';
 
 export interface InterestYoutubeResponse {

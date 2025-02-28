@@ -729,4 +729,4 @@ Temporary Items
 
 # Env
 .env.*
-!.env.sample
+!.env.dev

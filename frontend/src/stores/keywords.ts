@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 
 import { Keyword, KeywordInfo, Keywords, PrefixSumMap, CommonResult } from '@/types';
-import { MAX_KEYWORDS_NUM } from '@/constants/keywords';
+
+const MAX_KEYWORDS_NUM = 30;
 
 interface KeywordsStore {
   keywords: Keywords;
