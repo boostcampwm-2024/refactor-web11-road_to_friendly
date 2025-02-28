@@ -85,11 +85,6 @@ export class RoomsGateway implements OnModuleInit, OnGatewayDisconnect {
   handleDisconnect(client: Socket): void {
     const roomId = client.data.roomId;
 
-    if (roomId === undefined) {
-      // TODO: 여러 소켓에 대해 동작하는 이유 확인할 것
-      return;
-    }
-
     const clients = this.server.sockets.adapter.rooms.get(roomId);
 
     if (clients === undefined || clients.size === 0) {
